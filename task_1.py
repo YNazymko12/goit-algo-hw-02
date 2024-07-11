@@ -1,37 +1,45 @@
-from queue import Queue
-import random
+import queue
 import time
-
-# Створення черги заявок
-request_queue = Queue()
+import random
 
 # Функція генерації нових заявок
-def generate_request():
-    # Створення нових заявок з унікальним номером
-    request_id = random.randint(1, 1000)
-    # Додавання заявок до черги
-    request_queue.put(request_id)
-    print(f"Заявка {request_id} додана до черги")
+def generate_request(request_queue, request_id):
+    priority = random.randint(1, 10)  # Пріоритет заявки (1 - найвищий пріоритет)
+    request_data = f"Заявка №{request_id} з пріоритетом {priority}"
+    request_queue.put((priority, request_data))
+    print(f"Сгенеровано нову заявку: {request_data}")
 
 # Функція обробки заявок
-def process_request():
-    # Якщо черга не пуста:
+def process_request(request_queue):
     if not request_queue.empty():
-        #Видалення заявки з черги
-        request_id = request_queue.get()
-        #Обробка заявки
-        print(f"Заявка {request_id} оброблена")
+        priority, request_data = request_queue.get()
+        print(f"Обробка заявки: {request_data}")
+        # Симуляція затримки обробки
+        time.sleep(random.uniform(0.5, 2.0))
     else:
-        print("Черга порожня")
+        print("Черга пуста. Немає заявок для обробки.")
 
-try:
-    while True:
-        generate_request()
-        process_request()
-        # Імітація деякої затримки між операціями
-        time.sleep(1)
+def main():
+    request_queue = queue.PriorityQueue()
+    request_id = 0
 
-except KeyboardInterrupt:
-    print("Програма завершена.")
+    try:
+        while True:
+            # Генерування нових заявок з імовірністю 50%
+            if random.choice([True, False]):
+                request_id += 1
+                generate_request(request_queue, request_id)
 
-    
+            # Обробка заявок з імовірністю 50%
+            if random.choice([True, False]):
+                process_request(request_queue)
+            
+            # Затримка між ітераціями
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("\nПрограма завершена користувачем")
+
+if __name__ == "__main__":
+    main()
+
